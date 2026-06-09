@@ -7,4 +7,6 @@ public interface UserService {
     UserResponse saveUser(UserRequest request);
 
     UserResponse findUserById(Long id);
+
+    UserResponse updateUser(Long id, UserRequest request);
 }

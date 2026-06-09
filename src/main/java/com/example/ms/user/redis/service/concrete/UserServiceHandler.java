@@ -70,6 +70,29 @@ public class UserServiceHandler implements UserService {
                 .build();
     }
 
+    @Override
+    public UserResponse updateUser(Long id, UserRequest request) {
+        UserEntity cachedUser = cacheUtil.getBucket(getKey(id));
+
+        if (cachedUser != null) {
+            cacheUtil.delete(getKey(cachedUser.getId()));
+            System.out.println("🔴 Redis-dən silindi!");
+        }
+
+        UserEntity userEntity = fetchUserIfExist(id);
+        userEntity.setFirstName(request.getFirstName());
+        cacheUtil.saveToCache(getKey(id), userEntity, 10L, ChronoUnit.MINUTES);
+        System.out.println("🟢 DB-dən oxundu və Redis-ə yazıldı!");
+        userRepository.save(userEntity);
+        return UserResponse.builder()
+                .id(userEntity.getId())
+                .firstName(userEntity.getFirstName())
+                .createdAt(userEntity.getCreatedAt())
+                .status(userEntity.getStatus())
+                .updatedAt(userEntity.getUpdatedAt())
+                .build();
+    }
+
     private UserEntity fetchUserIfExist(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("User not found: " + id));

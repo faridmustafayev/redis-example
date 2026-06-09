@@ -30,4 +30,9 @@ public class CacheUtil {
         bucket.set(value);
         bucket.expire(Duration.of(expireTime, temporalUnit));
     }
+
+    public boolean delete(String key) {
+        return redissonClient.getBucket(key).delete();
+    }
+
 }
