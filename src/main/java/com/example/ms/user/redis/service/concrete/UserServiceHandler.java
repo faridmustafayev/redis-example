@@ -1,5 +1,6 @@
 package com.example.ms.user.redis.service.concrete;
 
+import com.example.ms.user.redis.config.UserCache;
 import com.example.ms.user.redis.dao.entity.UserEntity;
 import com.example.ms.user.redis.dao.repository.UserRepository;
 import com.example.ms.user.redis.dto.request.UserRequest;
@@ -31,7 +32,10 @@ public class UserServiceHandler implements UserService {
                 .build();
 
         userRepository.save(userEntity);
-        cacheUtil.saveToCache(getKey(userEntity.getId()), userEntity, 10L, ChronoUnit.MINUTES);
+//        cacheUtil.saveToCache(getKey(userEntity.getId()), userEntity, 1L, ChronoUnit.HOURS);
+
+        UserCache cache = new UserCache(userEntity.getId(), userEntity.getFirstName(), "Mustafayev");
+        cacheUtil.saveToCache(getKey(cache.getId()), cache, 1L, ChronoUnit.HOURS);
 
         return UserResponse.builder()
                 .id(userEntity.getId())
@@ -44,21 +48,24 @@ public class UserServiceHandler implements UserService {
 
     @Override
     public UserResponse findUserById(Long id) {
-        UserEntity cachedUser = cacheUtil.getBucket(getKey(id));
+        UserCache cachedUser = cacheUtil.getBucket(getKey(id));
         if (cachedUser != null) {
             System.out.println("🔴 Redis-dən oxundu!");
             return UserResponse.builder()
                     .id(cachedUser.getId())
                     .firstName(cachedUser.getFirstName())
-                    .createdAt(cachedUser.getCreatedAt())
-                    .status(cachedUser.getStatus())
-                    .updatedAt(cachedUser.getUpdatedAt())
+//                    .createdAt(cachedUser.getCreatedAt())
+//                    .status(cachedUser.getStatus())
+//                    .updatedAt(cachedUser.getUpdatedAt())
                     .build();
         }
 
 
         UserEntity userEntity = fetchUserIfExist(id);
-        cacheUtil.saveToCache(getKey(id), userEntity, 10L, ChronoUnit.MINUTES);
+//        cacheUtil.saveToCache(getKey(id), userEntity, 1L, ChronoUnit.HOURS);
+
+        UserCache cache = new UserCache(userEntity.getId(), userEntity.getFirstName(), "Mustafayev");
+        cacheUtil.saveToCache(getKey(cache.getId()), cache, 1L, ChronoUnit.HOURS);
         System.out.println("🟢 DB-dən oxundu və Redis-ə yazıldı!");
 
         return UserResponse.builder()
