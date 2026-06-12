@@ -10,9 +10,9 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserCache implements Serializable {
-    @Serial
-    private final static long serialVersionUID = 1L;
+public class UserCache /*implements Serializable*/ {
+//    @Serial
+//    private final static long serialVersionUID = 1L;
     private Long id;
     private String firstName;
     private String lastName;
